@@ -1,0 +1,416 @@
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 800;
+  background-color: var(--dsw-specific-scrim);
+  animation: dsFadeIn 0.2s ease;
+}
+
+.drawer {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 810;
+  width: 304px;
+  max-width: calc(100vw - 52px);
+  background-color: var(--dsw-specific-sidebar-fill);
+  border-right: 1px solid var(--dsw-alias-border-l1);
+  display: flex;
+  flex-direction: column;
+  padding: calc(10px + var(--sat)) 12px calc(10px + var(--sab));
+  box-shadow: var(--dsw-shadow-lv3);
+  animation: dsDrawerIn 0.24s var(--ds-ease-spring);
+}
+
+.drawerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 4px 14px;
+}
+
+.brandRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.brandText {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--dsw-alias-brand-primary);
+}
+
+.closeBtn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--dsw-alias-label-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.newChatPill {
+  width: 100%;
+  height: 42px;
+  border-radius: 999px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  background-color: var(--dsw-alias-button-elevated-fill);
+  color: var(--dsw-alias-label-primary);
+  font-size: 14.5px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(15, 17, 21, 0.04);
+}
+
+.newChatPill:active {
+  transform: scale(0.98);
+}
+
+.searchWrap {
+  position: relative;
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 11px;
+  color: var(--dsw-alias-label-tertiary);
+  display: flex;
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  height: 36px;
+  padding: 0 30px 0 32px;
+  border-radius: 10px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  background-color: var(--dsw-alias-bg-base);
+  color: var(--dsw-alias-label-primary);
+  font-size: 13.5px;
+  outline: none;
+}
+
+.searchInput::placeholder {
+  color: var(--dsw-alias-label-caption);
+}
+
+.searchClearBtn {
+  position: absolute;
+  right: 8px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--dsw-alias-label-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.listScroll {
+  flex: 1;
+  min-height: 0;
+  margin-top: 14px;
+  overflow-y: auto;
+}
+
+.emptyState {
+  padding: 36px 12px;
+  text-align: center;
+  font-size: 13.5px;
+  color: var(--dsw-alias-label-tertiary);
+}
+
+.group {
+  margin-bottom: 14px;
+}
+
+.groupTitle {
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--dsw-alias-label-tertiary);
+}
+
+.sessionRow {
+  display: flex;
+  align-items: center;
+  border-radius: 12px;
+  margin-bottom: 2px;
+  transition: background-color 0.15s ease;
+}
+
+.sessionRow:active,
+.sessionRow:hover {
+  background-color: var(--dsw-specific-sidebar-nav-item-hover);
+}
+
+.sessionRowActive {
+  background-color: var(--dsw-specific-sidebar-nav-item-active);
+}
+
+.sessionBtn {
+  flex: 1;
+  min-width: 0;
+  height: 40px;
+  padding: 0 6px 0 10px;
+  border: none;
+  background: transparent;
+  color: var(--dsw-alias-label-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.pinMark {
+  color: var(--dsw-alias-brand-text);
+  display: flex;
+  flex-shrink: 0;
+}
+
+.sessionTitle {
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sessionMoreBtn {
+  width: 32px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  color: var(--dsw-alias-label-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.drawerFooter {
+  padding-top: 10px;
+  border-top: 1px solid var(--dsw-alias-border-l1);
+}
+
+.footerCard {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 14px;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.footerCard:active {
+  background-color: var(--dsw-specific-sidebar-nav-item-hover);
+}
+
+.avatarCircle {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background-color: var(--dsw-alias-button-ghost-active-fill);
+  color: var(--dsw-alias-brand-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.footerText {
+  flex: 1;
+  min-width: 0;
+}
+
+.footerTitle {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--dsw-alias-label-primary);
+}
+
+.footerSub {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  color: var(--dsw-alias-label-tertiary);
+  margin-top: 1px;
+}
+
+.statusDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.statusDotOk {
+  background-color: var(--dsw-static-green-500);
+}
+
+.statusDotWarn {
+  background-color: var(--dsw-static-amber-500);
+}
+
+.footerGear {
+  color: var(--dsw-alias-label-secondary);
+  display: flex;
+}
+
+/* Modals & Sheets */
+.modalScrim {
+  position: fixed;
+  inset: 0;
+  z-index: 980;
+  background-color: var(--dsw-specific-scrim);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: dsFadeIn 0.16s ease;
+}
+
+.bottomSheet {
+  width: 100%;
+  background-color: var(--dsw-specific-sheet-bg);
+  border-radius: 22px 22px 0 0;
+  padding: 10px 16px calc(18px + var(--sab));
+  box-shadow: var(--dsw-shadow-lv3);
+  animation: dsSlideUp 0.22s var(--ds-ease-spring);
+}
+
+.sheetHandle {
+  width: 36px;
+  height: 4px;
+  border-radius: 999px;
+  background-color: var(--dsw-alias-border-l3);
+  margin: 0 auto 12px;
+}
+
+.sheetTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--dsw-alias-label-secondary);
+  padding: 0 6px 10px;
+  border-bottom: 1px solid var(--dsw-alias-border-l1);
+  margin-bottom: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sheetItem {
+  width: 100%;
+  height: 46px;
+  padding: 0 10px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--dsw-alias-label-primary);
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.sheetItem:active {
+  background-color: var(--dsw-alias-interactive-bg-active);
+}
+
+.sheetItemDanger {
+  color: var(--dsw-alias-state-error-primary);
+}
+
+.dialogCard {
+  align-self: center;
+  width: calc(100% - 48px);
+  max-width: 360px;
+  border-radius: 20px;
+  background-color: var(--dsw-specific-sheet-bg);
+  padding: 20px;
+  box-shadow: var(--dsw-shadow-lv3);
+}
+
+.dialogTitle {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--dsw-alias-label-primary);
+  margin-bottom: 10px;
+}
+
+.dialogBody {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--dsw-alias-label-secondary);
+}
+
+.dialogInput {
+  width: 100%;
+  height: 42px;
+  padding: 0 12px;
+  border-radius: 12px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  background-color: var(--dsw-alias-bg-layer-2);
+  color: var(--dsw-alias-label-primary);
+  font-size: 14.5px;
+  outline: none;
+}
+
+.dialogActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.dialogCancelBtn,
+.dialogPrimaryBtn,
+.dialogDangerBtn {
+  height: 38px;
+  padding: 0 18px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.dialogCancelBtn {
+  border: 1px solid var(--dsw-alias-border-l2);
+  background: transparent;
+  color: var(--dsw-alias-label-primary);
+}
+
+.dialogPrimaryBtn {
+  border: none;
+  background-color: var(--dsw-alias-button-primary-fill);
+  color: var(--dsw-alias-label-primary-foreground);
+}
+
+.dialogDangerBtn {
+  border: none;
+  background-color: var(--dsw-alias-state-error-primary);
+  color: #ffffff;
+}

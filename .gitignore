@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.DS_Store
+*.log
+scratch/
+android/.gradle/
+android/app/build/
+android/build/
+android/captures/
+android/.idea/
+android/local.properties
+*.apk
+*.aab
+*.tsbuildinfo

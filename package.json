@@ -1,0 +1,52 @@
+{
+  "name": "deepshek",
+  "version": "0.1.0",
+  "description": "DeepSeek Android App replica built with Capacitor, React, and TypeScript, featuring personal DeepSeek API key support.",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "cap:sync": "npx cap sync android",
+    "cap:build": "npm run build && npx cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.2.0",
+    "@capacitor/app": "^6.0.2",
+    "@capacitor/core": "^6.2.0",
+    "@capacitor/haptics": "^6.0.2",
+    "@capacitor/keyboard": "^6.0.3",
+    "@capacitor/preferences": "^6.0.3",
+    "@capacitor/status-bar": "^6.0.2",
+    "clsx": "^2.1.1",
+    "fflate": "^0.8.2",
+    "idb": "^8.0.3",
+    "katex": "^0.16.11",
+    "mdast-util-find-and-replace": "^3.0.2",
+    "mdast-util-from-markdown": "^2.0.2",
+    "mdast-util-gfm": "^3.1.0",
+    "mdast-util-math": "^3.0.0",
+    "mermaid": "^11.4.1",
+    "micromark-extension-gfm": "^3.0.0",
+    "micromark-extension-llm-math": "^3.1.0",
+    "prismjs": "^1.29.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "zustand": "^4.5.5"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.2.0",
+    "@types/katex": "^0.16.7",
+    "@types/mdast": "^4.0.4",
+    "@types/prismjs": "^1.26.4",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "playwright-core": "^1.49.1",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.3"
+  }
+}

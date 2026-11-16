@@ -1,0 +1,119 @@
+.codeBlock {
+  margin: 12px 0;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--dsw-alias-border-l2);
+  background-color: var(--dsw-alias-markdown-code-block);
+}
+
+.codeHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background-color: var(--dsw-alias-markdown-code-block-banner);
+  border-bottom: 1px solid var(--dsw-alias-border-l1);
+}
+
+.codeLang {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--dsw-alias-label-secondary);
+  text-transform: lowercase;
+}
+
+.copyCodeBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--dsw-alias-label-secondary);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.copyCodeBtn:active {
+  background-color: var(--dsw-alias-interactive-bg-active);
+}
+
+.codeBlock pre {
+  margin: 0;
+  padding: 12px 14px;
+  overflow-x: auto;
+  font-family: var(--ds-font-family-code);
+  font-size: 13px;
+  line-height: 1.58;
+  color: var(--dsw-alias-label-primary);
+}
+
+.mermaidTabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.mermaidTab,
+.mermaidTabActive {
+  border: none;
+  border-radius: 6px;
+  padding: 3px 9px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.mermaidTab {
+  background: transparent;
+  color: var(--dsw-alias-label-tertiary);
+}
+
+.mermaidTabActive {
+  background-color: var(--dsw-alias-bg-elevated);
+  color: var(--dsw-alias-label-primary);
+  font-weight: 500;
+}
+
+.mermaidCanvas {
+  padding: 14px;
+  overflow-x: auto;
+  background: var(--dsw-alias-bg-base);
+  display: flex;
+  justify-content: center;
+}
+
+.mermaidCanvas svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.citationBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 5px;
+  margin: 0 2px;
+  border: none;
+  border-radius: 999px;
+  background-color: var(--dsw-alias-markdown-citation);
+  color: var(--dsw-alias-label-secondary);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  vertical-align: super;
+  cursor: pointer;
+}
+
+.citationBadge:active {
+  background-color: var(--dsw-alias-button-ghost-active-fill);
+  color: var(--dsw-alias-brand-text);
+}
+
+.inlineImg {
+  max-width: 100%;
+  border-radius: 10px;
+  margin: 8px 0;
+}
