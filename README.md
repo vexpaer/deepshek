@@ -2,7 +2,7 @@
 
 基于 React、TypeScript 与 Capacitor 的 Android 聊天客户端，支持个人 API 密钥与本地聊天记录。
 
-## 0.2.0 移动端重构
+## 0.1.1 移动端重构
 
 参照 DeepSeek 手机端截图重做首页、输入框、附件面板及设置：
 

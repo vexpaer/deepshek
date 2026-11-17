@@ -508,7 +508,7 @@ export const SettingsDetail: React.FC<{ page: 'account' | 'data' | 'advanced'; o
               <DeepSeekWhaleLogo size={36} />
               <div>
                 <div className={styles.aboutName}>Deepshek Android</div>
-                <div className={styles.aboutVersion}>{dict.settingsVersionLabel} v0.2.0</div>
+                <div className={styles.aboutVersion}>{dict.settingsVersionLabel} v0.1.1</div>
               </div>
             </div>
             <div className={styles.aboutDesc}>{dict.settingsProjectDesc}</div>
