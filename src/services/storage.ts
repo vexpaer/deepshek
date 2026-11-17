@@ -173,11 +173,17 @@ export async function importSessionsFromZip(file: File): Promise<ChatSession[]> 
     }
   }
   const db = await getDb()
+  if (imported.length === 0) throw new Error('备份中没有有效的对话，未修改现有记录')
+  const existing = await db.getAll('sessions')
+  const merged = new Map(existing.map((session) => [session.id, session]))
+  for (const session of imported) {
+    const previous = merged.get(session.id)
+    if (!previous || session.updatedAt >= previous.updatedAt) merged.set(session.id, session)
+  }
   const tx = db.transaction('sessions', 'readwrite')
-  await tx.store.clear()
-  for (const s of imported) {
+  for (const s of merged.values()) {
     await tx.store.put(s)
   }
   await tx.done
-  return imported.sort((a, b) => b.updatedAt - a.updatedAt)
+  return [...merged.values()].sort((a, b) => b.updatedAt - a.updatedAt)
 }

@@ -457,3 +457,25 @@
   gap: 10px;
   margin-top: 18px;
 }
+
+.topBar { min-height: calc(64px + var(--sat)); border: 0; padding: calc(8px + var(--sat)) 17px 8px; }
+.backBtn { background: var(--dsw-specific-attachment-tile); }
+.topTitle { font-size: 22px; font-weight: 500; }
+.menuScroll { flex: 1; min-height: 0; overflow: auto; padding: 8px 19px calc(32px + var(--sab)); width: 100%; max-width: 720px; margin: auto; }
+.menuSection { margin-bottom: 32px; }
+.menuSection h2 { margin: 8px 20px 12px; color: var(--dsw-alias-label-tertiary); font-size: 18px; font-weight: 400; }
+.menuCard { border-radius: 20px; overflow: hidden; background: var(--dsw-specific-settings-card); }
+.menuRow { display: flex; align-items: center; width: 100%; min-height: 58px; padding: 12px 18px; gap: 20px; border: 0; background: transparent; color: var(--dsw-alias-label-primary); text-align: left; font-size: 22px; }
+.menuRow > svg { flex: 0 0 auto; color: var(--dsw-alias-label-tertiary); }
+.menuIcon { flex: 0 0 24px; display: grid; place-items: center; }
+.menuLabel { flex: 1; white-space: nowrap; }
+.menuValue { color: var(--dsw-alias-label-tertiary); white-space: nowrap; font-size: 21px; }
+.standalone { border-radius: 20px; background: var(--dsw-specific-settings-card); margin: 40px 0; overflow: hidden; }
+.menuRow:active, .choice:active { background: var(--dsw-alias-interactive-bg-active); }
+.choice { width: 100%; min-height: 64px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; color: var(--dsw-alias-label-primary); font-size: 20px; border: 0; background: transparent; text-align: left; }
+.choice[aria-pressed='true'] svg { color: var(--dsw-alias-brand-text); }
+.fontPreview, .aboutCopy { padding: 24px 18px; }
+.aboutCopy p { line-height: 1.8; color: var(--dsw-alias-label-secondary); }
+@media (max-width: 370px) { .menuRow { font-size: 19px; gap: 14px; padding: 12px 16px; } .menuValue { font-size: 17px; } }
+
+.extraSettings { border-radius: 20px; background: var(--dsw-specific-settings-card); margin: 40px 0; overflow: hidden; }

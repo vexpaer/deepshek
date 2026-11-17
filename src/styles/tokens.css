@@ -177,3 +177,34 @@ body[data-font-size='comfortable'] {
   --chat-font-size: 17px;
   --chat-line-height: 1.72;
 }
+
+/* Mobile reference palette: neutral surfaces, blue selected controls. */
+body {
+  --dsw-specific-input-major: #f4f4f4;
+  --dsw-specific-input-shadow: none;
+  --dsw-specific-attachment-tile: #ededed;
+  --dsw-specific-settings-bg: #f5f5f5;
+  --dsw-specific-settings-card: #fff;
+  --dsw-alias-brand-primary: #557cf5;
+}
+body[data-ds-dark-theme='true'] {
+  --dsw-alias-bg-base: #101010;
+  --dsw-alias-bg-layer-2: #252525;
+  --dsw-alias-bg-layer-3: #383838;
+  --dsw-alias-bg-elevated: #282828;
+  --dsw-alias-label-primary: #f3f3f3;
+  --dsw-alias-label-secondary: #b5b5b5;
+  --dsw-alias-label-tertiary: #909090;
+  --dsw-alias-label-caption: #808084;
+  --dsw-alias-brand-primary: #557cf5;
+  --dsw-alias-brand-text: #729bf2;
+  --dsw-alias-button-ghost-active-fill: #283142;
+  --dsw-alias-button-ghost-active-border: #394769;
+  --dsw-specific-input-major: #232323;
+  --dsw-specific-input-shadow: none;
+  --dsw-specific-attachment-tile: #393939;
+  --dsw-specific-settings-bg: #1e1e1e;
+  --dsw-specific-settings-card: #282828;
+  --dsw-specific-sidebar-fill: #1e1e1e;
+  --dsw-specific-bubble: #282828;
+}

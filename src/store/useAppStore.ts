@@ -77,6 +77,7 @@ export function getSiblingInfo(session: ChatSession, message: ChatMessage): Sibl
 }
 
 interface AppState {
+  composerKey: number
   initialized: boolean
   settings: AppSettings
   sessions: ChatSession[]
@@ -241,6 +242,7 @@ export const useAppStore = create<AppState>((set, get) => {
   }
 
   return {
+    composerKey: 0,
     initialized: false,
     settings: loadSettingsSync(),
     sessions: [],
@@ -300,6 +302,7 @@ export const useAppStore = create<AppState>((set, get) => {
       if (abortController) abortController.abort()
       void triggerHaptic(settings.hapticsEnabled, 'light')
       set({
+        composerKey: get().composerKey + 1,
         activeSessionId: null,
         streamingSessionId: null,
         abortController: null,
@@ -313,6 +316,7 @@ export const useAppStore = create<AppState>((set, get) => {
         abortController.abort()
       }
       set({
+        composerKey: get().composerKey + 1,
         activeSessionId: id,
         drawerOpen: false,
         streamingSessionId: streamingSessionId === id ? id : null,

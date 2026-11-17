@@ -1,84 +1,33 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import clsx from 'clsx'
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera'
+import { useBackLayer } from '../hooks/useBackLayer'
 import { getDict } from '../i18n'
+import { isNativePlatform, triggerHaptic } from '../services/native'
+import { startVoice } from '../services/voice'
 import { useAppStore } from '../store/useAppStore'
 import type { ChatAttachment } from '../types/chat'
-import {
-  IconClose,
-  IconFile,
-  IconGlobe,
-  IconImage,
-  IconMic,
-  IconPlus,
-  IconSend,
-  IconStop,
-  IconThink,
-  IconTrash,
-} from './Icons'
+import { IconCamera, IconClose, IconFile, IconGlobe, IconImage, IconPaperclip, IconPlus, IconSend, IconStop, IconThink, IconVoice } from './Icons'
 import styles from './ChatInput.module.css'
 
-interface SpeechRecognitionAlternative {
-  transcript: string
+const MAX_FILES = 6
+const MAX_BYTES = 20 * 1024 * 1024
+function formatBytes(bytes: number) {
+  return bytes < 1024 * 1024 ? `${Math.max(1, Math.round(bytes / 1024))} KB` : `${(bytes / 1024 / 1024).toFixed(1)} MB`
 }
-interface SpeechRecognitionResult {
-  0: SpeechRecognitionAlternative
-  isFinal: boolean
-}
-interface SpeechRecognitionEventLike {
-  results: ArrayLike<SpeechRecognitionResult>
-}
-interface SpeechRecognitionLike {
-  lang: string
-  interimResults: boolean
-  continuous: boolean
-  onresult: ((ev: SpeechRecognitionEventLike) => void) | null
-  onerror: (() => void) | null
-  onend: (() => void) | null
-  start: () => void
-  stop: () => void
-}
-
-function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
-}
-
-async function readFileAsAttachment(file: File): Promise<ChatAttachment> {
-  const id = `att_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`
-  const isImage = file.type.startsWith('image/')
+async function readFile(file: File): Promise<ChatAttachment> {
+  const image = file.type.startsWith('image/')
   const dataUrl = await new Promise<string>((resolve, reject) => {
     const reader = new FileReader()
-    reader.onload = () => resolve(String(reader.result || ''))
-    reader.onerror = () => reject(new Error('Failed to read file'))
+    reader.onload = () => resolve(String(reader.result))
+    reader.onerror = () => reject(new Error('读取附件失败'))
     reader.readAsDataURL(file)
   })
-
-  let textContent: string | undefined
-  if (!isImage && (file.type.startsWith('text/') || /\.(txt|md|json|ts|tsx|js|py|csv|log)$/i.test(file.name))) {
-    try {
-      textContent = await file.text()
-    } catch {
-      // Binary file like PDF/DOCX will rely on Files API
-    }
-  }
-
-  return {
-    id,
-    name: file.name,
-    size: file.size,
-    mimeType: file.type || (isImage ? 'image/jpeg' : 'application/octet-stream'),
-    kind: isImage ? 'image' : 'file',
-    dataUrl,
-    textContent,
-    status: 'ready',
-  }
+  const textContent = !image && (file.type.startsWith('text/') || /\.(txt|md|json|ts|tsx|js|py|csv|log)$/i.test(file.name)) ? await file.text() : undefined
+  return { id: crypto.randomUUID(), name: file.name, size: file.size, mimeType: file.type || 'application/octet-stream', kind: image ? 'image' : 'file', dataUrl, textContent, status: 'ready' }
 }
 
-export const ChatInput: React.FC<{
-  draftText?: string
-  onDraftConsumed?: () => void
-}> = ({ draftText, onDraftConsumed }) => {
+export function ChatInput() {
   const settings = useAppStore((s) => s.settings)
   const deepThink = useAppStore((s) => s.deepThink)
   const webSearch = useAppStore((s) => s.webSearch)
@@ -90,319 +39,166 @@ export const ChatInput: React.FC<{
   const stopStreaming = useAppStore((s) => s.stopStreaming)
   const showToast = useAppStore((s) => s.showToast)
   const setLightboxImageUrl = useAppStore((s) => s.setLightboxImageUrl)
-
   const dict = getDict(settings.locale)
+  const en = settings.locale === 'en-US'
   const [text, setText] = useState('')
   const [attachments, setAttachments] = useState<ChatAttachment[]>([])
-  const [sheetOpen, setSheetOpen] = useState(false)
+  const [expanded, setExpanded] = useState(false)
   const [recording, setRecording] = useState(false)
-
+  const [cancelVoice, setCancelVoice] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [reading, setReading] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const imageInputRef = useRef<HTMLInputElement>(null)
-  const docInputRef = useRef<HTMLInputElement>(null)
-  const recognitionRef = useRef<SpeechRecognitionLike | null>(null)
+  const imageInput = useRef<HTMLInputElement>(null)
+  const cameraInput = useRef<HTMLInputElement>(null)
+  const fileInput = useRef<HTMLInputElement>(null)
+  const voiceRef = useRef<ReturnType<typeof startVoice>>(null)
+  const holdTimer = useRef<ReturnType<typeof setTimeout>>()
+  const hold = useRef<{ y: number; started: boolean; cancel: boolean; original: string } | null>(null)
+  const mounted = useRef(true)
+  const busyRef = useRef(false)
+  const readingRef = useRef(false)
+  const isStreaming = Boolean(streamingSessionId && streamingSessionId === activeSessionId)
+  const canSend = Boolean(text.trim() || attachments.length)
 
-  const isStreamingHere = Boolean(
-    streamingSessionId && streamingSessionId === activeSessionId
-  )
+  useBackLayer(expanded || recording, () => {
+    if (recording) { voiceRef.current?.cancel(); setRecording(false) }
+    else setExpanded(false)
+  }, 10)
 
   useEffect(() => {
-    if (draftText) {
-      setText(draftText)
-      onDraftConsumed?.()
-      requestAnimationFrame(() => textareaRef.current?.focus())
-    }
-  }, [draftText, onDraftConsumed])
-
+    mounted.current = true
+    return () => { mounted.current = false; clearTimeout(holdTimer.current); voiceRef.current?.cancel() }
+  }, [])
   useEffect(() => {
-    const el = textareaRef.current
-    if (!el) return
-    el.style.height = 'auto'
-    el.style.height = `${Math.min(el.scrollHeight, 168)}px`
+    const input = textareaRef.current
+    if (input) { input.style.height = '0px'; input.style.height = `${Math.min(input.scrollHeight, 160)}px` }
   }, [text])
+  useEffect(() => {
+    const viewport = window.visualViewport
+    const closeOnKeyboard = () => { if (window.innerHeight - (viewport?.height || window.innerHeight) > 100) setExpanded(false) }
+    viewport?.addEventListener('resize', closeOnKeyboard)
+    return () => viewport?.removeEventListener('resize', closeOnKeyboard)
+  }, [])
 
-  const handleFilesSelected = async (files: FileList | null) => {
-    setSheetOpen(false)
-    if (!files || files.length === 0) return
-    const list = Array.from(files).slice(0, 6)
+  const addFiles = async (files: FileList | File[] | null) => {
+    if (!files?.length || readingRef.current) return
+    setExpanded(false)
+    const list = Array.from(files)
+    const capacity = MAX_FILES - attachments.length
+    if (list.length > capacity) showToast(en ? 'Up to 6 attachments per message' : '每条消息最多添加 6 个附件')
+    const valid = list.slice(0, capacity).filter((file) => file.size <= MAX_BYTES)
+    if (valid.length < Math.min(list.length, capacity)) showToast(en ? 'Each file must be under 20 MB' : '单个附件不能超过 20 MB', 'error')
+    readingRef.current = true
+    setReading(true)
     try {
-      const next = await Promise.all(list.map(readFileAsAttachment))
-      setAttachments((prev) => [...prev, ...next].slice(0, 6))
-    } catch {
-      showToast('读取附件失败', 'error')
-    }
+      const next = await Promise.all(valid.map(readFile))
+      if (mounted.current) setAttachments((prev) => [...prev, ...next].slice(0, MAX_FILES))
+    } catch { showToast(en ? 'Could not read attachment' : '读取附件失败', 'error') }
+    finally { readingRef.current = false; if (mounted.current) setReading(false) }
   }
 
-  const handleSend = async () => {
-    if (isStreamingHere) {
-      stopStreaming()
-      return
-    }
-    const clean = text.trim()
-    if (!clean && attachments.length === 0) return
-    const currentAttachments = [...attachments]
-    setText('')
-    setAttachments([])
-    await sendUserMessage(clean, currentAttachments)
-  }
-
-  const toggleVoice = () => {
-    if (recording) {
-      recognitionRef.current?.stop()
-      setRecording(false)
-      return
-    }
-    const win = window as unknown as {
-      SpeechRecognition?: new () => SpeechRecognitionLike
-      webkitSpeechRecognition?: new () => SpeechRecognitionLike
-    }
-    const SpeechRec = win.SpeechRecognition || win.webkitSpeechRecognition
-    if (!SpeechRec) {
-      showToast(dict.voiceUnsupported, 'info')
-      return
-    }
+  const takePhoto = async () => {
+    if (!isNativePlatform()) { cameraInput.current?.click(); return }
     try {
-      const rec = new SpeechRec()
-      rec.lang = settings.locale === 'en-US' ? 'en-US' : 'zh-CN'
-      rec.interimResults = true
-      rec.continuous = false
-      const baseText = text ? `${text} ` : ''
-      rec.onresult = (ev) => {
-        let transcript = ''
-        for (let i = 0; i < ev.results.length; i++) {
-          transcript += ev.results[i][0]?.transcript ?? ''
-        }
-        setText(baseText + transcript)
+      const photo = await Camera.getPhoto({ source: CameraSource.Camera, resultType: CameraResultType.Uri, quality: 85, width: 2048, correctOrientation: true })
+      if (photo.webPath) {
+        const blob = await (await fetch(photo.webPath)).blob()
+        await addFiles([new File([blob], `photo-${Date.now()}.${photo.format}`, { type: blob.type || `image/${photo.format}` })])
       }
-      rec.onerror = () => {
-        setRecording(false)
-        showToast(dict.voiceUnsupported, 'info')
-      }
-      rec.onend = () => setRecording(false)
-      recognitionRef.current = rec
-      setRecording(true)
-      rec.start()
-    } catch {
-      setRecording(false)
-      showToast(dict.voiceUnsupported, 'info')
+    } catch (error) {
+      if (!/cancel/i.test(String(error))) showToast(en ? 'Unable to open the camera. Check permissions.' : '无法打开相机，请检查相机权限', 'error')
     }
   }
 
-  const canSend = Boolean(text.trim() || attachments.length > 0)
+  const beginVoice = () => {
+    if (busyRef.current || readingRef.current || isStreaming) return
+    setExpanded(false)
+    textareaRef.current?.blur()
+    const base = text
+    setRecording(true)
+    setCancelVoice(false)
+    void triggerHaptic(settings.hapticsEnabled)
+    voiceRef.current = startVoice(settings.locale,
+      (transcript) => { if (mounted.current) setText(`${base}${base ? ' ' : ''}${transcript}`) },
+      () => { if (mounted.current) { setRecording(false); setCancelVoice(false) } },
+      () => { if (mounted.current) showToast(dict.voiceUnsupported, 'info') })
+  }
+
+  const send = async () => {
+    if (isStreaming) { stopStreaming(); return }
+    if (busyRef.current || readingRef.current || !canSend) return
+    busyRef.current = true
+    setBusy(true)
+    voiceRef.current?.cancel()
+    setExpanded(false)
+    const sentText = text.trim()
+    const sentAttachments = attachments
+    setText(''); setAttachments([])
+    textareaRef.current?.blur()
+    try { await sendUserMessage(sentText, sentAttachments) }
+    catch (error) {
+      if (mounted.current) { setText(sentText); setAttachments(sentAttachments) }
+      showToast(error instanceof Error ? error.message : (en ? 'Could not send message' : '发送失败，请重试'), 'error')
+    } finally { busyRef.current = false; if (mounted.current) setBusy(false) }
+  }
+
+  const endHold = () => {
+    clearTimeout(holdTimer.current)
+    const state = hold.current
+    hold.current = null
+    if (!state?.started) return
+    if (state.cancel) { voiceRef.current?.cancel(); setText(state.original) }
+    else voiceRef.current?.stop()
+    setCancelVoice(false)
+  }
 
   return (
-    <>
-      <div className={styles.composerOuter}>
-        <div className={styles.composerCard}>
-          {attachments.length > 0 ? (
-            <div className={styles.attachmentsRow}>
-              {attachments.map((att) => (
-                <div key={att.id} className={styles.attachmentChip}>
-                  {att.kind === 'image' && att.dataUrl ? (
-                    <button
-                      type="button"
-                      className={styles.thumbBtn}
-                      onClick={() => setLightboxImageUrl(att.dataUrl!)}
-                    >
-                      <img src={att.dataUrl} alt={att.name} className={styles.thumbImg} />
-                    </button>
-                  ) : (
-                    <div className={styles.fileChipInner}>
-                      <span className={styles.fileChipIcon}>
-                        <IconFile size={16} />
-                      </span>
-                      <div className={styles.fileChipMeta}>
-                        <div className={styles.fileChipName}>{att.name}</div>
-                        <div className={styles.fileChipSize}>{formatBytes(att.size)}</div>
-                      </div>
-                    </div>
-                  )}
-                  <button
-                    type="button"
-                    className={styles.removeChipBtn}
-                    aria-label={dict.delete}
-                    onClick={() =>
-                      setAttachments((prev) => prev.filter((item) => item.id !== att.id))
-                    }
-                  >
-                    <IconClose size={11} />
-                  </button>
-                </div>
-              ))}
-            </div>
-          ) : null}
-
-          <div className={styles.inputBoxWrap}>
-            {recording ? (
-              <div className={styles.voiceSpectrumBanner} onClick={toggleVoice}>
-                <div className={styles.spectrumBars}>
-                  {[0, 1, 2, 3, 4, 5, 6].map((idx) => (
-                    <span
-                      key={idx}
-                      className={styles.spectrumBar}
-                      style={{ animationDelay: `${idx * 90}ms` }}
-                    />
-                  ))}
-                </div>
-                <span className={styles.voiceHint}>
-                  {dict.voiceListening} · {dict.voiceTapToStop}
-                </span>
-              </div>
-            ) : null}
-            <textarea
-              ref={textareaRef}
-              rows={1}
-              value={text}
-              placeholder={dict.inputPlaceholder}
-              className={clsx(styles.textarea, recording && styles.textareaHidden)}
-              onChange={(e) => setText(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
-                  // On desktop keyboard convenience; Android virtual keyboard uses Enter for newline or send
-                  if (window.innerWidth >= 768) {
-                    e.preventDefault()
-                    void handleSend()
-                  }
-                }
-              }}
-            />
+    <div className={styles.composerOuter}>
+      <div className={styles.composerCard}>
+        {!!attachments.length && <div className={styles.attachmentsRow}>
+          {attachments.map((file) => <div className={styles.attachmentChip} key={file.id}>
+            {file.kind === 'image' ? <button className={styles.thumbBtn} aria-label={file.name} onClick={() => setLightboxImageUrl(file.dataUrl!)}><img className={styles.thumbImg} src={file.dataUrl} alt={file.name} /></button> : <div className={styles.fileChipInner}><IconFile size={24} /><div className={styles.fileChipMeta}><div className={styles.fileChipName}>{file.name}</div><div className={styles.fileChipSize}>{formatBytes(file.size)}</div></div></div>}
+            <button className={styles.removeChipBtn} aria-label={`${dict.delete} ${file.name}`} onClick={() => setAttachments((prev) => prev.filter((item) => item.id !== file.id))}><IconClose size={12} /></button>
+          </div>)}
+        </div>}
+        <div className={styles.inputBoxWrap}>
+          <textarea ref={textareaRef} rows={1} value={text} aria-label={en ? 'Message' : '消息'} placeholder={en ? 'Message or hold to talk' : dict.inputPlaceholder} className={clsx(styles.textarea, recording && styles.textareaHidden)}
+            onChange={(event) => setText(event.target.value)} onFocus={() => setExpanded(false)}
+            onPaste={(event) => { if (event.clipboardData.files.length) { event.preventDefault(); void addFiles(event.clipboardData.files) } }}
+            onKeyDown={(event) => { if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing && window.matchMedia('(pointer: fine)').matches) { event.preventDefault(); void send() } }}
+            onPointerDown={(event) => {
+              if (event.pointerType === 'mouse' || text) return
+              hold.current = { y: event.clientY, started: false, cancel: false, original: text }
+              holdTimer.current = setTimeout(() => { if (hold.current) { hold.current.started = true; beginVoice() } }, 450)
+            }}
+            onPointerMove={(event) => { if (hold.current) { const moved = hold.current.y - event.clientY; if (!hold.current.started && Math.abs(moved) > 12) clearTimeout(holdTimer.current); hold.current.cancel = moved > 60; if (hold.current.started) setCancelVoice(hold.current.cancel) } }}
+            onPointerUp={endHold} onPointerCancel={() => { if (hold.current) hold.current.cancel = true; endHold() }} onContextMenu={(event) => { if (hold.current?.started) event.preventDefault() }} />
+          {recording && <button className={clsx(styles.voiceSpectrumBanner, cancelVoice && styles.voiceCancel)} onClick={() => voiceRef.current?.stop()} aria-label={dict.voiceTapToStop}>
+            <span className={styles.spectrumBars}>{Array.from({ length: 12 }, (_, index) => <span key={index} style={{ animationDelay: `${index * 75}ms` }} />)}</span>
+            <span>{cancelVoice ? (en ? 'Release to cancel' : '松开取消') : (en ? 'Listening · tap to finish' : '正在聆听 · 点击结束')}</span>
+          </button>}
+        </div>
+        <div className={styles.functionRow}>
+          <div className={styles.leftToggles}>
+            <button className={clsx(styles.pillToggle, deepThink && styles.pillToggleActive)} aria-pressed={deepThink} onClick={() => setDeepThink(!deepThink)}><IconThink size={19} /><span>{dict.deepThink}</span></button>
+            <button className={clsx(styles.pillToggle, webSearch && styles.pillToggleActive)} aria-pressed={webSearch} onClick={() => setWebSearch(!webSearch)}><IconGlobe size={18} /><span>{dict.webSearch}</span></button>
           </div>
-
-          <div className={styles.functionRow}>
-            <div className={styles.leftToggles}>
-              <button
-                type="button"
-                className={clsx(styles.pillToggle, deepThink && styles.pillToggleActive)}
-                aria-pressed={deepThink}
-                onClick={() => setDeepThink(!deepThink)}
-              >
-                <IconThink size={15} />
-                <span>{dict.deepThink}</span>
-              </button>
-              <button
-                type="button"
-                className={clsx(styles.pillToggle, webSearch && styles.pillToggleActive)}
-                aria-pressed={webSearch}
-                onClick={() => setWebSearch(!webSearch)}
-              >
-                <IconGlobe size={14} />
-                <span>{dict.webSearch}</span>
-              </button>
-            </div>
-
-            <div className={styles.rightControls}>
-              <button
-                type="button"
-                className={clsx(styles.iconActionBtn, recording && styles.iconActionRecording)}
-                aria-label={dict.voiceTapToStop}
-                onClick={toggleVoice}
-              >
-                <IconMic size={18} filled={recording} />
-              </button>
-              <button
-                type="button"
-                className={styles.iconActionBtn}
-                aria-label={dict.attachmentSheetTitle}
-                onClick={() => setSheetOpen(true)}
-              >
-                <IconPlus size={19} />
-              </button>
-              <button
-                type="button"
-                disabled={!isStreamingHere && !canSend}
-                aria-label={isStreamingHere ? 'Stop' : 'Send'}
-                className={clsx(
-                  styles.sendButton,
-                  !isStreamingHere && !canSend && styles.sendButtonDisabled
-                )}
-                onClick={() => void handleSend()}
-              >
-                {isStreamingHere ? <IconStop size={15} /> : <IconSend size={16} />}
-              </button>
-            </div>
+          <div className={styles.rightControls}>
+            <button className={styles.iconActionBtn} aria-label={expanded ? (en ? 'Close attachments' : '收起附件') : dict.attachmentSheetTitle} aria-expanded={expanded} aria-controls="attachment-panel" disabled={reading || busy} onClick={() => { textareaRef.current?.blur(); voiceRef.current?.cancel(); setExpanded(!expanded); void triggerHaptic(settings.hapticsEnabled) }}><span className={styles.outlinedCircle}>{expanded ? <IconClose size={20} /> : <IconPlus size={23} />}</span></button>
+            {canSend || isStreaming || busy ? <button className={styles.sendButton} aria-label={isStreaming ? (en ? 'Stop' : '停止生成') : (en ? 'Send' : '发送')} disabled={(!isStreaming && busy) || reading} onClick={() => void send()}>{isStreaming ? <IconStop size={19} /> : busy ? <span className={styles.loadingDot} /> : <IconSend size={24} />}</button> : <button className={clsx(styles.iconActionBtn, recording && styles.iconActionRecording)} aria-label={recording ? dict.voiceTapToStop : (en ? 'Voice input' : '语音输入')} onClick={() => recording ? voiceRef.current?.stop() : beginVoice()}><IconVoice size={32} /></button>}
           </div>
         </div>
+        {reading && <div role="status" className={styles.reading}>{en ? 'Reading attachments…' : '正在读取附件…'}</div>}
       </div>
-
-      <input
-        ref={imageInputRef}
-        type="file"
-        accept="image/*"
-        multiple
-        hidden
-        onChange={(e) => {
-          void handleFilesSelected(e.target.files)
-          e.target.value = ''
-        }}
-      />
-      <input
-        ref={docInputRef}
-        type="file"
-        accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.md,.csv,.json,.ts,.tsx,.js,.py"
-        multiple
-        hidden
-        onChange={(e) => {
-          void handleFilesSelected(e.target.files)
-          e.target.value = ''
-        }}
-      />
-
-      {sheetOpen ? (
-        <div className={styles.sheetBackdrop} onClick={() => setSheetOpen(false)}>
-          <div className={styles.sheetPanel} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.sheetHandle} />
-            <div className={styles.sheetHeader}>
-              <span>{dict.attachmentSheetTitle}</span>
-              <button
-                type="button"
-                className={styles.sheetCloseBtn}
-                aria-label={dict.cancel}
-                onClick={() => setSheetOpen(false)}
-              >
-                <IconClose size={18} />
-              </button>
-            </div>
-            <div className={styles.sheetGrid}>
-              <button
-                type="button"
-                className={styles.sheetActionCard}
-                onClick={() => imageInputRef.current?.click()}
-              >
-                <div className={styles.sheetActionIcon}>
-                  <IconImage size={22} />
-                </div>
-                <div className={styles.sheetActionTitle}>{dict.takePhotoOrImage}</div>
-                <div className={styles.sheetActionSub}>{dict.takePhotoSub}</div>
-              </button>
-              <button
-                type="button"
-                className={styles.sheetActionCard}
-                onClick={() => docInputRef.current?.click()}
-              >
-                <div className={styles.sheetActionIcon}>
-                  <IconFile size={22} />
-                </div>
-                <div className={styles.sheetActionTitle}>{dict.uploadDocument}</div>
-                <div className={styles.sheetActionSub}>{dict.uploadDocumentSub}</div>
-              </button>
-            </div>
-            {text || attachments.length > 0 ? (
-              <button
-                type="button"
-                className={styles.sheetDangerBtn}
-                onClick={() => {
-                  setText('')
-                  setAttachments([])
-                  setSheetOpen(false)
-                }}
-              >
-                <IconTrash size={16} />
-                <span>{dict.clearComposer}</span>
-              </button>
-            ) : null}
-          </div>
-        </div>
-      ) : null}
-    </>
+      {expanded && <div id="attachment-panel" className={styles.attachmentPanel} role="group" aria-label={dict.attachmentSheetTitle}>
+        <button onClick={() => void takePhoto()}><IconCamera size={26} /><span>{en ? 'Camera' : '拍照'}</span></button>
+        <button onClick={() => imageInput.current?.click()}><IconImage size={26} /><span>{en ? 'Photos' : '相册'}</span></button>
+        <button onClick={() => fileInput.current?.click()}><IconPaperclip size={26} /><span>{en ? 'Files' : '文件'}</span></button>
+      </div>}
+      <input ref={cameraInput} data-testid="camera-input" type="file" accept="image/*" capture="environment" hidden onChange={(event) => { void addFiles(event.target.files); event.target.value = '' }} />
+      <input ref={imageInput} data-testid="image-input" type="file" accept="image/*" multiple hidden onChange={(event) => { void addFiles(event.target.files); event.target.value = '' }} />
+      <input ref={fileInput} data-testid="file-input" type="file" multiple hidden onChange={(event) => { void addFiles(event.target.files); event.target.value = '' }} />
+    </div>
   )
 }

@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import clsx from 'clsx'
+import { saveFile } from '../services/download'
 import { getDict } from '../i18n'
 import { getActiveThread, useAppStore } from '../store/useAppStore'
 import type { ChatSession } from '../types/chat'
@@ -16,6 +17,7 @@ import {
   IconTrash,
 } from './Icons'
 import styles from './NavigationDrawer.module.css'
+import { useBackLayer } from '../hooks/useBackLayer'
 
 interface SessionGroup {
   key: string
@@ -110,11 +112,18 @@ export const NavigationDrawer: React.FC = () => {
     [sessions, settings.locale, searchQuery]
   )
 
+  useBackLayer(drawerOpen, () => {
+    if (deleteTarget) setDeleteTarget(null)
+    else if (renameTarget) setRenameTarget(null)
+    else if (menuSession) setMenuSession(null)
+    else setDrawerOpen(false)
+  }, 20)
+
   if (!drawerOpen) return null
 
   const hasKey = Boolean(settings.apiKey.trim())
 
-  const exportMarkdown = (sess: ChatSession) => {
+  const exportMarkdown = async (sess: ChatSession) => {
     const thread = getActiveThread(sess)
     const md = thread
       .map((m) =>
@@ -130,12 +139,12 @@ export const NavigationDrawer: React.FC = () => {
     const blob = new Blob([`# ${sess.title}\n\n${md}`], {
       type: 'text/markdown;charset=utf-8',
     })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `${sess.title.replace(/[^\w\u4e00-\u9fa5-]+/g, '_') || 'chat'}.md`
-    a.click()
-    setTimeout(() => URL.revokeObjectURL(url), 5000)
+    try {
+      await saveFile(`${sess.title.replace(/[^\w\u4e00-\u9fa5-]+/g, '_') || 'chat'}.md`, blob)
+    } catch {
+      showToast('导出失败', 'error')
+      return
+    }
     showToast('已导出 Markdown', 'success')
   }
 

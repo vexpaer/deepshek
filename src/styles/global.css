@@ -325,3 +325,11 @@ body[data-ds-dark-theme='true'] .ds-code-body .token.class-name {
   overflow-y: hidden;
   padding: 4px 0;
 }
+
+button { cursor: pointer; }
+button:disabled { cursor: default; opacity: .45; }
+button, a, input, textarea, select { touch-action: manipulation; }
+button:focus-visible, a:focus-visible { outline: 2px solid var(--dsw-alias-brand-text); outline-offset: 4px; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}
