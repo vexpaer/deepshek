@@ -29,15 +29,17 @@ export async function triggerHaptic(
   }
 }
 
-export async function syncStatusBarTheme(dark: boolean): Promise<void> {
+export async function syncStatusBarTheme(dark: boolean, settingsOpen = false): Promise<void> {
+  const color = dark ? (settingsOpen ? '#1e1e1e' : '#101010') : (settingsOpen ? '#f5f5f5' : '#ffffff')
   const metaTheme = document.querySelector('meta[name="theme-color"]')
   if (metaTheme) {
-    metaTheme.setAttribute('content', dark ? '#151517' : '#ffffff')
+    metaTheme.setAttribute('content', color)
   }
   if (!isNativePlatform()) return
   try {
+    await StatusBar.setOverlaysWebView({ overlay: false })
     await StatusBar.setStyle({ style: dark ? Style.Dark : Style.Light })
-    await StatusBar.setBackgroundColor({ color: dark ? '#151517' : '#ffffff' })
+    await StatusBar.setBackgroundColor({ color: color })
   } catch {
     // Ignore on web or unsupported OS versions
   }
@@ -46,6 +48,7 @@ export async function syncStatusBarTheme(dark: boolean): Promise<void> {
 export function initViewportAndKeyboard(): () => void {
   const updateHeight = () => {
     const vh = window.visualViewport?.height ?? window.innerHeight
+    document.body.dataset.keyboardOpen = String(window.innerHeight - vh > 100)
     document.documentElement.style.setProperty('--app-viewport-height', `${vh}px`)
   }
   updateHeight()

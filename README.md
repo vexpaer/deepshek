@@ -1,90 +1,55 @@
 # Deepshek
 
-基于 **Capacitor 6 + React 18 + TypeScript + Vite** 复刻的 DeepSeek 安卓端移动应用（`v0.1.0`），像素级还原 DeepSeek App 移动端交互体验，并支持配置 **个人 DeepSeek API Key** 直连官方模型或切换 OpenAI 兼容端点。
+基于 React、TypeScript 与 Capacitor 的 Android 聊天客户端，支持个人 API 密钥与本地聊天记录。
 
----
+## 0.1.1 移动端重构
 
-## 核心特性
+参照 DeepSeek 手机端截图重做首页、输入框、附件面板及设置：
 
-### 1. DeepSeek 安卓端原生交互体验
-- **双模式自适应主题**：精确复刻官方 `--dsw-*` 浅色/深色（`#151517`）语义色板，支持「跟随系统 / 浅色 / 深色」实时切换，并联动 Android 原生 `StatusBar` 与 `theme-color`。
-- **深度思考与自动折叠**：支持思考模式流式渲染（流光标题动效、耗时统计），思考完成后自动折叠（可在设置中关闭），点击可随时展开/收起推理链。
-- **服务端联网搜索与引用溯源**：完整适配 DeepSeek 应用协议中的 `deepseek_web_search` 与 `deepseek_read_url` 工具事件，支持搜索步骤状态条、行内可点击引用角标 `[1]` 以及 Android 底部「参考资料」弹窗卡片。
-- **富文本与专业排版引擎**：基于 `mdast` + `micromark-extension-llm-math` 构建流式安全渲染管线，支持 **KaTeX** 数学公式、**PrismJS** 多语言代码高亮与一键复制、**Mermaid** 流程图「图表 / 代码」切换（自适应深浅色）及横向可滚动表格。
-- **树形多分支对话与交互**：支持用户消息**编辑重发**、AI 回复**重新生成**、`1/N` 多分支版本切换、长按/点击操作栏（复制、Web Speech API / 语音朗读、点赞/点踩反馈）。
-- **抽屉侧边栏与手势体验**：支持左边缘右滑打开侧边栏、历史对话实时搜索、置顶/重命名/删除与导出 Markdown、按时间分组（置顶 / 今天 / 昨天 / 7 天内 / 30 天内）。
-- **移动端输入与多媒体交互**：底部悬浮圆角输入栏、语音听写波形动效、图片预览灯箱与文件附件底部弹窗；支持 Capacitor 原生 `Haptics` 震动反馈与 Android 物理返回键层级拦截。
+- 新对话居中标题、双横线菜单、蓝色鲸鱼及单行问候语，采用接近纯黑的聊天背景。
+- 大圆角输入框；深度思考、智能搜索横向滚动按钮；附件入口与语音入口；输入后切换为发送按钮，生成中切换为停止按钮。
+- 内联展开拍照、相册、文件三项入口；图片预览与删除、文件大小展示；每条消息最多 6 个附件，单个最大 20 MB。
+- Android 使用相机和系统语音识别；浏览器使用文件选择与 Web Speech API（取决于浏览器支持）。输入区支持长按启动、上滑取消语音，亦可点击语音按钮启动。
+- 设置主页使用账户、应用、关于分组。API 密钥、地址、协议与模型放在账号管理；数据管理包含导入、导出和清空记录；语言、外观、字体大小为独立子页。
+- Android 返回键与 Escape 逐层关闭弹层、设置子页与侧栏；新建/切换对话重置输入草稿。
+- Android 导出调用系统分享面板，可选择保存位置；网页端下载文件。ZIP 导入合并已有记录，同 ID 保留较新版本。
+- 保留流式回复、推理折叠、Markdown/公式/代码/Mermaid、历史搜索、分支编辑和重新生成。
 
-### 2. 个人 DeepSeek API Key 配置与多协议支持
-在 **「设置 -> DeepSeek API 配置（个人密钥）」** 中支持：
-- **个人密钥直连**：输入 `sk-...` 开头的 DeepSeek API Key，支持密钥显隐切换。
-- **一键测试连接与余额查询**：通过 `/models` 验证密钥有效性、统计网络延迟，并自动查询 `/user/balance` 账户余额。
-- **多协议切换**：
-  - **DeepSeek 应用协议（推荐）**：调用 `/anthropic/v1/messages`，完整支持深度思考、联网搜索 (`deepseek_web_search`)、网页阅读 (`deepseek_read_url`) 与文件解析 (`/anthropic/v1/files`)。
-  - **OpenAI 兼容协议**：调用 `/chat/completions`，兼容 `reasoning_content` 推理输出及第三方兼容服务地址（自定义 Base URL）。
-- **本地演示模式（Demo Mode）**：未配置 API Key 时默认开启本地演示模式，无需联网即可完整体验深度思考、联网搜索引用、Mermaid 流程图、代码高亮与数学公式渲染。
-- **数据备份与迁移**：支持导入/导出 ZIP 聊天记录压缩包（兼容官方导出格式），所有配置与会话数据本地持久化存储在 `IndexedDB` 与 `Capacitor Preferences`。
+## 开发
 
----
-
-## 技术栈
-
-- **前端框架**：React 18 + TypeScript 5 + Vite 6 + Zustand 4 + CSS Modules
-- **排版渲染**：`mdast-util-from-markdown` + `micromark-extension-llm-math` + `KaTeX` + `PrismJS` + `Mermaid`
-- **本地存储**：`idb` (IndexedDB) + `fflate` (ZIP 导入/导出) + `@capacitor/preferences`
-- **安卓容器**：Capacitor 6 (`@capacitor/android`, `@capacitor/app`, `@capacitor/haptics`, `@capacitor/keyboard`, `@capacitor/status-bar`)
-
----
-
-## 本地开发与构建
-
-### 环境要求
-- Node.js >= 20（推荐 22 LTS）
-- JDK 17 + Android SDK（仅本地编译 APK 时需要；推送 Tag 时 GitHub Actions 会自动构建并发布 APK）
-
-### 常用命令
+Node.js 20+，Android 构建需要 JDK 17、Android SDK 34。
 
 ```bash
-# 安装依赖
-npm install
-
-# 启动本地开发服务器
+npm ci
 npm run dev
-
-# 类型检查与生产构建
 npm run typecheck
 npm run build
-
-# 同步静态资源到 Android 原生工程
-npx cap sync android
+npm run cap:build
+cd android
+./gradlew assembleDebug
 ```
 
-### 本地编译 Android APK
+APK：`android/app/build/outputs/apk/debug/app-debug.apk`。
 
 ```bash
-npm run build
-npx cap sync android
-cd android && ./gradlew assembleDebug
+# 手机尺寸交互检查与截图；先在另一个终端运行 npm run dev
+npx playwright-core install chromium
+npm run test:mobile
+# 使用本机 Chromium 时可设置 CHROMIUM_PATH
 ```
 
-编译产物位于 `android/app/build/outputs/apk/debug/app-debug.apk`。
+GitHub Actions 在 PR / main / codex 分支推送时执行生产构建、移动端流程检查和 Android APK 编译，上传截图与 APK。版本标签触发 Release 工作流。
 
----
+## API 与数据
 
-## 个人 API Key 使用指南
+侧栏 → 设置 → 账号管理：填写个人 API 密钥，选择协议、模型与 API 地址，再测试连接并保存。模型列表可从服务端 `/models` 获取。具体模型、搜索和附件能力由所选服务与协议决定；界面的开关不会为服务端增加能力。
 
-1. 前往 [DeepSeek 开放平台](https://platform.deepseek.com/api_keys) 创建并复制你的个人 API Key（以 `sk-` 开头）。
-2. 打开 Deepshek，点击首页顶部的 **「演示模式 · 点击配置个人 DeepSeek API Key」**，或从左上角侧边栏底部进入 **「设置」**。
-3. 粘贴 API Key 后点击 **「测试连接」** 验证延迟与可用余额，然后点击 **「保存配置」** 即可开始对话。
+无密钥且开启演示模式时，回复由本地预设内容生成；模拟搜索与引用用于展示界面。关闭演示模式后须配置密钥。
 
-> 隐私说明：你的个人 API Key 仅保存在本机设备本地存储中，所有模型请求均由客户端直连你在设置中配置的 API 端点，不会经过任何第三方中转服务器。
+对话保存于 IndexedDB，设置保存于浏览器本地存储 / Capacitor Preferences。请求直连配置的 API 服务。ZIP 备份包含对话与附件，不包含 API 密钥。退出登录清除本机密钥，保留对话。
 
----
+## 素材与许可
 
-## 版本发布
+鲸鱼矢量标记来自 [Lobe Icons 的 DeepSeek 图标](https://github.com/lobehub/lobe-icons/blob/master/packages/static-svg/icons/deepseek.svg)；品牌标记归其权利人所有。本项目为独立客户端。
 
-推送语义化版本标签（如 `v0.1.0`）时，GitHub Actions 工作流（[`.github/workflows/release.yml`](.github/workflows/release.yml)）会自动完成 Web 构建、Capacitor Android 同步、Gradle APK 打包，并将 `deepshek-v0.1.0-android.apk` 上传至对应 GitHub Release。
-
-## 开源协议
-
-[MIT License](./LICENSE)
+代码使用 [MIT](LICENSE) 许可。

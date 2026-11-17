@@ -1,44 +1,13 @@
 import React from 'react'
 
-export const DeepSeekWhaleLogo: React.FC<{ size?: number; className?: string }> = ({
-  size = 44,
-  className,
-}) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 64 64"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    className={className}
-    aria-label="DeepSeek"
-  >
-    {/* DeepSeek iconic left-facing blue whale mark */}
-    <path
-      d="M52.5 22.8C54.6 18.8 57.5 16.9 59.5 17.6C60.7 18.0 60.8 19.7 59.8 21.5C58.6 23.7 56.3 25.4 54.0 26.8C55.9 27.0 58.2 27.6 59.2 29.2C60.2 30.8 59.0 32.9 56.5 33.4C54.0 33.9 51.2 32.8 49.4 31.3C48.1 39.2 42.3 47.0 32.9 49.4C22.4 52.1 11.4 47.6 7.4 38.6C5.6 34.6 5.6 29.9 7.6 26.0C10.8 19.8 17.8 16.4 24.8 17.8C26.2 18.1 27.6 18.7 28.8 19.6C29.4 16.7 31.2 13.7 34.4 12.2C35.8 11.5 37.3 11.8 37.8 12.9C38.4 14.1 37.4 15.8 36.1 17.2C34.9 18.5 34.5 20.1 35.2 21.4C38.9 23.6 42.2 26.4 45.6 27.2C48.3 27.8 50.8 26.0 52.5 22.8Z"
-      fill="#4D6BFE"
-    />
-    {/* Subtle belly / smile contour */}
-    <path
-      d="M11.6 35.8C13.8 41.8 20.2 46.2 28.4 45.8C32.4 45.6 36.0 44.1 38.6 41.7C36.9 40.3 34.2 39.8 31.4 40.6C29.0 41.3 26.7 41.0 24.9 39.5C22.5 37.4 20.1 35.8 16.5 35.5C14.6 35.3 12.9 35.4 11.6 35.8Z"
-      fill="#FFFFFF"
-      fillOpacity="0.92"
-    />
-    {/* Whale eye */}
-    <circle cx="17.2" cy="27.2" r="2.2" fill="#FFFFFF" />
-    {/* Dorsal / pectoral detail */}
-    <path
-      d="M27.8 31.6C30.2 30.2 33.4 31.2 34.8 33.9C32.1 35.2 28.8 34.4 27.8 31.6Z"
-      fill="#FFFFFF"
-      fillOpacity="0.28"
-    />
-  </svg>
+export const DeepSeekWhaleLogo: React.FC<{ size?: number; className?: string }> = ({ size = 44, className }) => (
+  <svg role="img" aria-label="DeepSeek" className={className} width={size} height={size} viewBox="0 0 24 24" fill="var(--dsw-alias-brand-primary)" fillRule="evenodd" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}><path d="M23.748 4.482c-.254-.124-.364.113-.512.234-.051.039-.094.09-.137.136-.372.397-.806.657-1.373.626-.829-.046-1.537.214-2.163.848-.133-.782-.575-1.248-1.247-1.548-.352-.156-.708-.311-.955-.65-.172-.241-.219-.51-.305-.774-.055-.16-.11-.323-.293-.35-.2-.031-.278.136-.356.276-.313.572-.434 1.202-.422 1.84.027 1.436.633 2.58 1.838 3.393.137.093.172.187.129.323-.082.28-.18.552-.266.833-.055.179-.137.217-.329.14a5.526 5.526 0 01-1.736-1.18c-.857-.828-1.631-1.742-2.597-2.458a11.365 11.365 0 00-.689-.471c-.985-.957.13-1.743.388-1.836.27-.098.093-.432-.779-.428-.872.004-1.67.295-2.687.684a3.055 3.055 0 01-.465.137 9.597 9.597 0 00-2.883-.102c-1.885.21-3.39 1.102-4.497 2.623C.082 8.606-.231 10.684.152 12.85c.403 2.284 1.569 4.175 3.36 5.653 1.858 1.533 3.997 2.284 6.438 2.14 1.482-.085 3.133-.284 4.994-1.86.47.234.962.327 1.78.397.63.059 1.236-.03 1.705-.128.735-.156.684-.837.419-.961-2.155-1.004-1.682-.595-2.113-.926 1.096-1.296 2.746-2.642 3.392-7.003.05-.347.007-.565 0-.845-.004-.17.035-.237.23-.256a4.173 4.173 0 001.545-.475c1.396-.763 1.96-2.015 2.093-3.517.02-.23-.004-.467-.247-.588zM11.581 18c-2.089-1.642-3.102-2.183-3.52-2.16-.392.024-.321.471-.235.763.09.288.207.486.371.739.114.167.192.416-.113.603-.673.416-1.842-.14-1.897-.167-1.361-.802-2.5-1.86-3.301-3.307-.774-1.393-1.224-2.887-1.298-4.482-.02-.386.093-.522.477-.592a4.696 4.696 0 011.529-.039c2.132.312 3.946 1.265 5.468 2.774.868.86 1.525 1.887 2.202 2.891.72 1.066 1.494 2.082 2.48 2.914.348.292.625.514.891.677-.802.09-2.14.11-3.054-.614zm1-6.44a.306.306 0 01.415-.287.302.302 0 01.2.288.306.306 0 01-.31.307.303.303 0 01-.304-.308zm3.11 1.596c-.2.081-.399.151-.59.16a1.245 1.245 0 01-.798-.254c-.274-.23-.47-.358-.552-.758a1.73 1.73 0 01.016-.588c.07-.327-.008-.537-.239-.727-.187-.156-.426-.199-.688-.199a.559.559 0 01-.254-.078c-.11-.054-.2-.19-.114-.358.028-.054.16-.186.192-.21.356-.202.767-.136 1.146.016.352.144.618.408 1.001.782.391.451.462.576.685.914.176.265.336.537.445.848.067.195-.019.354-.25.452z" /></svg>
 )
 
 export const IconMenu: React.FC<{ size?: number }> = ({ size = 22 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
     <path
-      d="M4 6.5H20M4 12H15.5M4 17.5H20"
+      d="M3 7H21M3 17H13"
       stroke="currentColor"
       strokeWidth="1.9"
       strokeLinecap="round"
@@ -475,4 +444,29 @@ export const IconSystem: React.FC<{ size?: number }> = ({ size = 16 }) => (
     <rect x="2" y="2.5" width="12" height="9" rx="1.6" stroke="currentColor" strokeWidth="1.4" />
     <path d="M5.5 13.8H10.5M8 11.5V13.8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
   </svg>
+)
+
+export const IconCamera: React.FC<{ size?: number }> = ({ size = 24 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M8 5l1.5-2h5L16 5h3a3 3 0 013 3v10a3 3 0 01-3 3H5a3 3 0 01-3-3V8a3 3 0 013-3z" /><circle cx="12" cy="12.5" r="4" /></svg>
+)
+export const IconVoice: React.FC<{ size?: number }> = ({ size = 32 }) => (
+  <svg width={size} height={size} viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="16" cy="16" r="13.5" /><path d="M19 8a13 13 0 010 16M14.5 11a8 8 0 010 10" /><circle cx="10" cy="16" r="1.3" fill="currentColor" stroke="none" /></svg>
+)
+export const IconAccount: React.FC<{ size?: number }> = ({ size = 24 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="7" r="4.5" /><path d="M3.5 22a8.5 8.5 0 0117 0" /></svg>
+)
+export const IconDatabase: React.FC<{ size?: number }> = ({ size = 24 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><ellipse cx="11" cy="5" rx="8" ry="3.5" /><path d="M3 5v13c0 2 3.6 3.5 8 3.5M19 5v6M3 11c0 2 3.6 3.5 8 3.5" /><circle cx="18" cy="18" r="3" /><path d="M18 13.5v1M18 21.5v1M13.5 18h1M21.5 18h1M14.8 14.8l.7.7M20.5 20.5l.7.7M14.8 21.2l.7-.7M20.5 15.5l.7-.7" /></svg>
+)
+export const IconInfo: React.FC<{ size?: number }> = ({ size = 24 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="12" r="9" /><path d="M12 11v6M12 7v.1" /></svg>
+)
+export const IconHelp: React.FC<{ size?: number }> = ({ size = 24 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="12" r="9" /><path d="M9.5 8.5c.3-3 6-3 5.3.5-.4 1.8-3 1.5-3 4M12 17v.1" /></svg>
+)
+export const IconLogout: React.FC<{ size?: number }> = ({ size = 24 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M10 3H5a2 2 0 00-2 2v14a2 2 0 002 2h5M9 12h12M17 8l4 4-4 4" /></svg>
+)
+export const IconFont: React.FC<{ size?: number }> = ({ size = 24 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M1 19L5 7l4 12M2.5 15h5M11 19l5-16 6 16M13 13h7" /></svg>
 )
