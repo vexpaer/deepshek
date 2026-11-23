@@ -83,6 +83,28 @@ for (const [width, height] of [[320, 640], [360, 780], [430, 932], [812, 375], [
   const box = await page.getByRole('textbox', { name: '消息', exact: true }).boundingBox()
   assert.ok(box && box.y >= 0 && box.y + box.height <= height, `composer outside viewport at ${width}x${height}: ${JSON.stringify(box)}`)
 }
+// Exercise the actual outbound requests in fresh chats for both API protocols.
+await page.route('https://mock.invalid/**', route => route.fulfill({
+  status: 200, contentType: 'text/event-stream', body: 'data: [DONE]\n\n',
+}))
+for (const protocol of ['anthropic', 'openai']) {
+  for (const memoryEnabled of [true, false]) {
+    await page.evaluate(({ protocol, memoryEnabled }) => {
+      const key = 'deepshek.settings.v1'
+      const settings = JSON.parse(localStorage.getItem(key))
+      Object.assign(settings, { protocol, memoryEnabled, apiKey: 'test-only', baseUrl: 'https://mock.invalid', systemPrompt: 'Answer briefly.' })
+      localStorage.setItem(key, JSON.stringify(settings))
+    }, { protocol, memoryEnabled })
+    await page.reload()
+    await page.getByRole('textbox', { name: '消息', exact: true }).fill('推荐一个颜色')
+    const outbound = page.waitForRequest(request => request.url().startsWith('https://mock.invalid/') && request.method() === 'POST')
+    await page.getByRole('button', { name: '发送', exact: true }).click()
+    const body = (await outbound).postDataJSON()
+    const prompt = protocol === 'anthropic' ? body.system : body.messages[0].content
+    assert.ok(prompt.includes('Answer briefly.'))
+    assert.equal(prompt.includes('我喜欢蓝色'), memoryEnabled)
+  }
+}
 assert.deepEqual(errors, [])
 console.log('PASS: dark/light, attachment expansion/upload/removal, settings navigation, font preference, streaming stop, draft reset, 5 viewport sizes; no page errors.')
 await browser.close()

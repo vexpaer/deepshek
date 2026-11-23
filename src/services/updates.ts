@@ -36,7 +36,7 @@ export function downloadUpdate(update: Update) {
   const existing = downloads.get(update.digest)
   if (existing) return existing
   const task = (async () => {
-    await Filesystem.downloadFile({ ...file(update), url: update.url })
+    await Filesystem.downloadFile({ ...file(update), url: update.url, connectTimeout: 15000, readTimeout: 60000 })
     if (!await downloaded(update)) throw new Error('size')
   })().finally(() => downloads.delete(update.digest))
   downloads.set(update.digest, task)

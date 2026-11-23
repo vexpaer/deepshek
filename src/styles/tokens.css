@@ -180,6 +180,7 @@ body[data-font-size='comfortable'] {
 
 /* Mobile reference palette: neutral surfaces, blue selected controls. */
 body {
+  --dsw-alias-bg-base: #ffffff;
   --dsw-specific-input-major: #f4f4f4;
   --dsw-specific-input-shadow: none;
   --dsw-specific-attachment-tile: #ededed;

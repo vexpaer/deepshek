@@ -30,7 +30,8 @@ export async function triggerHaptic(
 }
 
 export async function syncStatusBarTheme(dark: boolean, settingsOpen = false): Promise<void> {
-  const color = dark ? (settingsOpen ? '#1e1e1e' : '#101010') : (settingsOpen ? '#f5f5f5' : '#ffffff')
+  const surface = settingsOpen ? '--dsw-specific-settings-bg' : '--dsw-alias-bg-base'
+  const color = getComputedStyle(document.body).getPropertyValue(surface).trim() || (dark ? '#101010' : '#ffffff')
   const metaTheme = document.querySelector('meta[name="theme-color"]')
   if (metaTheme) {
     metaTheme.setAttribute('content', color)
