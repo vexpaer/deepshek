@@ -176,8 +176,12 @@ export const useAppStore = create<AppState>((set, get) => {
     const thread = getActiveThread(currentSession).filter((m) => m.id !== assistantId)
 
     let lastSave = 0
+    const settings = get().settings
+    const systemPrompt = settings.memoryEnabled && settings.memory.trim()
+      ? [settings.systemPrompt, 'User-saved notes for this conversation:', settings.memory].filter(Boolean).join('\n\n')
+      : settings.systemPrompt
     const finalTurn = await streamAssistantResponse({
-      settings: get().settings,
+      settings: { ...settings, systemPrompt },
       thread,
       deepThink,
       webSearch,
@@ -468,6 +472,20 @@ export const useAppStore = create<AppState>((set, get) => {
         }))
         const updated = get().sessions.find((s) => s.id === sessionId)
         if (updated) void saveSession(updated)
+      }
+
+      if (get().settings.memoryEnabled) {
+        const note = cleanText.match(/^(?:请?记住|(?:please\s+)?remember\b(?:\s+that\b)?)[：:,，\s]*([\s\S]+)$/i)?.[1].trim()
+        const memory = get().settings.memory
+        if (note && !memory.split('\n').includes(note)) {
+          const next = [memory, note].filter(Boolean).join('\n')
+          if (next.length <= 4000) {
+            get().updateSettings({ memory: next })
+            get().showToast(settings.locale === 'en-US' ? 'Memory saved' : '已保存到记忆')
+          } else {
+            get().showToast(settings.locale === 'en-US' ? 'Memory is full. Edit it in Settings.' : '记忆已满，请在设置中整理。')
+          }
+        }
       }
 
       await runGeneration(sessionId, userId, deepThink, webSearch)

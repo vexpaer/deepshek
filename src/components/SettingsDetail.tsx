@@ -1,3 +1,4 @@
+import { APP_VERSION } from '../services/updates'
 import React, { useRef, useState } from 'react'
 import clsx from 'clsx'
 import { formatMessage, getDict } from '../i18n'
@@ -508,7 +509,7 @@ export const SettingsDetail: React.FC<{ page: 'account' | 'data' | 'advanced'; o
               <DeepSeekWhaleLogo size={36} />
               <div>
                 <div className={styles.aboutName}>Deepshek Android</div>
-                <div className={styles.aboutVersion}>{dict.settingsVersionLabel} v0.1.1</div>
+                <div className={styles.aboutVersion}>{dict.settingsVersionLabel} v{APP_VERSION}</div>
               </div>
             </div>
             <div className={styles.aboutDesc}>{dict.settingsProjectDesc}</div>

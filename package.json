@@ -1,6 +1,6 @@
 {
   "name": "deepshek",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "DeepSeek Android App replica built with Capacitor, React, and TypeScript, featuring personal DeepSeek API key support.",
   "license": "MIT",
   "private": true,

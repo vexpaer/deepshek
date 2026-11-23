@@ -13,6 +13,9 @@ export interface AppSettings {
   theme: ThemePreference
   locale: LocalePreference
   autoCollapseThinking: boolean
+  uiStyle: 'native' | 'md3'
+  memoryEnabled: boolean
+  memory: string
   hapticsEnabled: boolean
   fontSize: FontSizeScale
   ttsVoice: TtsVoice
