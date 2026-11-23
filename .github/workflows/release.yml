@@ -41,7 +41,7 @@ jobs:
       - run: chmod +x android/gradlew
       - name: Build Android APK
         working-directory: android
-        run: ./gradlew assembleDebug --no-daemon
+        run: ./gradlew assembleRelease --no-daemon
       - name: Prepare versioned APK
         id: version
         run: |
@@ -51,8 +51,17 @@ jobs:
             exit 1
           fi
           echo "tag=$TAG_NAME" >> "$GITHUB_OUTPUT"
-          mkdir -p release-assets
-          cp android/app/build/outputs/apk/debug/app-debug.apk "release-assets/deepshek-${TAG_NAME}-android.apk"
+      - name: Sign the release APK
+        env:
+          DEEPSHEK_SIGNING: ${{ secrets.DEEPSHEK_SIGNING }}
+        run: bash scripts/sign-release.sh
+      - name: Preserve the encrypted initial signing backup
+        if: hashFiles('signing-backup/keystore.cms') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: encrypted-signing-backup
+          path: signing-backup/keystore.cms
+          if-no-files-found: error
       - uses: actions/upload-artifact@v4
         with:
           name: deepshek-android-apk
