@@ -74,4 +74,5 @@ jobs:
           target_commitish: ${{ github.sha }}
           name: Deepshek ${{ steps.version.outputs.tag }}
           files: release-assets/*.apk
+          body_path: ${{ hashFiles(format('docs/release-notes/{0}.md', steps.version.outputs.tag)) != '' && format('docs/release-notes/{0}.md', steps.version.outputs.tag) || '' }}
           generate_release_notes: true
