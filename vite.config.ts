@@ -7,6 +7,7 @@ export default defineConfig({
   plugins: [react()],
   base: './',
   build: {
+    target: 'chrome80',
     outDir: 'dist',
     sourcemap: false,
     chunkSizeWarningLimit: 1500,

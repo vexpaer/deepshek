@@ -1,7 +1,6 @@
 import React, { memo, useEffect, useMemo, useRef, useState } from 'react'
 import katex from 'katex'
 import 'katex/dist/katex.min.css'
-import mermaid from 'mermaid'
 import Prism from 'prismjs'
 import 'prismjs/components/prism-bash'
 import 'prismjs/components/prism-css'
@@ -24,7 +23,6 @@ import type { SearchSource } from '../types/chat'
 import { IconCheck, IconCopy } from './Icons'
 import styles from './MarkdownRenderer.module.css'
 
-mermaid.initialize({ startOnLoad: false, securityLevel: 'strict', theme: 'default' })
 
 const CodeBlock: React.FC<{ lang?: string | null; code: string }> = ({ lang, code }) => {
   const [copied, setCopied] = useState(false)
@@ -93,6 +91,8 @@ const MermaidBlock: React.FC<{ code: string; streaming?: boolean }> = ({ code, s
     const renderId = `mmd_${Math.random().toString(36).slice(2, 8)}_${++seqRef.current}`
     const render = async () => {
       try {
+        const { default: mermaid } = await import('mermaid')
+        if (!active) return
         mermaid.initialize({
           startOnLoad: false,
           securityLevel: 'strict',
