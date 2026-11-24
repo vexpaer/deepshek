@@ -479,3 +479,10 @@
 @media (max-width: 370px) { .menuRow { font-size: 19px; gap: 14px; padding: 12px 16px; } .menuValue { font-size: 17px; } }
 
 .extraSettings { border-radius: 20px; background: var(--dsw-specific-settings-card); margin: 40px 0; overflow: hidden; }
+:global(body[data-ui='md3']) .menuCard { border-radius: 20px; }
+:global(body[data-ui='md3']) .menuSection h2 { color: var(--dsw-alias-brand-text); font-size: 14px; font-weight: 600; }
+:global(body[data-ui='md3']) .menuRow { font-size: 17px; min-height: 56px; }
+:global(body[data-ui='md3']) .choice[aria-pressed='true'] { background: var(--dsw-alias-button-ghost-active-fill); }
+
+:global(body[data-ui='md3']) .menuValue { font-size: 15px; }
+:global(body[data-ui='md3']) .choice { min-height: 56px; font-size: 17px; }

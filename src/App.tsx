@@ -43,6 +43,7 @@ export function App() {
     const applyTheme = () => {
       const dark = settings.theme === 'dark' || (settings.theme === 'system' && mq.matches)
       document.body.setAttribute('data-ds-dark-theme', String(dark))
+      document.body.dataset.ui = settings.uiStyle
       document.body.setAttribute('data-font-size', settings.fontSize)
       document.documentElement.lang = settings.locale
       document.documentElement.style.colorScheme = dark ? 'dark' : 'light'
@@ -51,7 +52,7 @@ export function App() {
     applyTheme()
     mq.addEventListener('change', applyTheme)
     return () => mq.removeEventListener('change', applyTheme)
-  }, [settings.theme, settings.fontSize, settings.locale, settingsOpen])
+  }, [settings.uiStyle, settings.theme, settings.fontSize, settings.locale, settingsOpen])
 
   useEffect(() => {
     const remove = registerAndroidBackButton(dismissTopLayer)
@@ -82,11 +83,11 @@ export function App() {
       <div className={styles.chatSurface} aria-hidden={drawerOpen || settingsOpen || Boolean(sourcesSheet) || Boolean(lightboxImageUrl)}>
         <header className={styles.header}>
           <button type="button" className={styles.headerIconBtn} aria-label={settings.locale === 'en-US' ? 'Open menu' : '打开侧边栏'} onClick={() => setDrawerOpen(true)}>
-            <IconMenu size={28} />
+            <IconMenu size={24} />
           </button>
           <h1 className={styles.headerTitle}>{hasConversation ? activeSession?.title : dict.untitledChat}</h1>
           <button type="button" className={styles.headerIconBtn} aria-label={dict.newChat} onClick={newChat}>
-            <IconNewChat size={28} />
+            <IconNewChat size={24} />
           </button>
         </header>
         <main className={styles.main}>

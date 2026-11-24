@@ -48,5 +48,21 @@ jobs:
       - run: chmod +x android/gradlew && cd android && ./gradlew assembleDebug --no-daemon
       - uses: actions/upload-artifact@v4
         with:
-          name: deepshek-0.1.1-android
+          name: deepshek-android-debug
           path: android/app/build/outputs/apk/debug/app-debug.apk
+      - name: Enable hardware acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Open chat on Android and capture its home screen
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          arch: x86_64
+          profile: pixel_4
+          script: bash scripts/android-smoke.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-home
+          path: scratch/android-home.png

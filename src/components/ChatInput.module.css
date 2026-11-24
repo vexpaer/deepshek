@@ -1,20 +1,20 @@
 .composerOuter { width: 100%; max-width: 760px; margin: auto; }
-.composerCard { display: flex; flex-direction: column; border-radius: 34px; background: var(--dsw-specific-input-major); border: 1.5px solid var(--dsw-alias-border-l2); padding: 15px 12px 10px; }
-.inputBoxWrap { position: relative; min-height: 48px; display: flex; align-items: flex-start; }
-.textarea { width: 100%; min-height: 36px; max-height: 160px; padding: 0 7px; border: 0; outline: 0; resize: none; background: transparent; color: var(--dsw-alias-label-primary); caret-color: var(--dsw-alias-brand-text); font-size: 22px; line-height: 1.5; overflow-y: auto; }
+.composerCard { display: flex; flex-direction: column; border-radius: 26px; background: var(--dsw-specific-input-major); border: 1.5px solid var(--dsw-alias-border-l2); padding: 12px 10px 5px; }
+.inputBoxWrap { position: relative; min-height: 36px; display: flex; align-items: flex-start; }
+.textarea { width: 100%; min-height: 36px; max-height: 160px; padding: 0 7px; border: 0; outline: 0; resize: none; background: transparent; color: var(--dsw-alias-label-primary); caret-color: var(--dsw-alias-brand-text); font-size: 17px; line-height: 1.5; overflow-y: auto; }
 .textarea::placeholder { color: var(--dsw-alias-label-caption); }
 .textareaHidden { opacity: 0; }
-.functionRow { display: flex; align-items: center; gap: 9px; margin-top: 9px; }
-.leftToggles { display: flex; flex: 1; align-items: center; gap: 9px; min-width: 0; overflow-x: auto; scrollbar-width: none; mask-image: linear-gradient(to right, #000 calc(100% - 5px), transparent); }
+.functionRow { display: flex; align-items: center; gap: 6px; margin-top: 2px; }
+.leftToggles { display: flex; flex: 1; align-items: center; gap: 6px; min-width: 0; overflow-x: auto; scrollbar-width: none; mask-image: linear-gradient(to right, #000 calc(100% - 5px), transparent); }
 .leftToggles::-webkit-scrollbar { display: none; }
-.pillToggle { flex: 0 0 auto; display: flex; align-items: center; justify-content: center; gap: 5px; min-height: 38px; padding: 0 13px; border-radius: 24px; border: 1.5px solid var(--dsw-alias-border-l3); background: transparent; color: var(--dsw-alias-label-secondary); font-size: 16px; line-height: 1; white-space: nowrap; transition: background .18s, color .18s; }
+.pillToggle { flex: 0 0 auto; display: flex; align-items: center; justify-content: center; gap: 5px; position: relative; min-height: 32px; margin: 6px 0; padding: 0 9px; border-radius: 24px; border: 1.5px solid var(--dsw-alias-border-l3); background: transparent; color: var(--dsw-alias-label-secondary); font-size: 13px; line-height: 1; white-space: nowrap; transition: background .18s, color .18s; }
 .pillToggleActive { background: var(--dsw-alias-button-ghost-active-fill); border-color: var(--dsw-alias-button-ghost-active-border); color: var(--dsw-alias-brand-text); }
 .rightControls { flex-shrink: 0; display: flex; align-items: center; gap: 7px; }
 .iconActionBtn, .sendButton { width: 44px; height: 44px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--dsw-alias-label-primary); }
-.outlinedCircle { width: 29px; height: 29px; border: 2px solid currentColor; border-radius: 50%; display: grid; place-items: center; }
+.outlinedCircle { width: 24px; height: 24px; border: 2px solid currentColor; border-radius: 50%; display: grid; place-items: center; }
 .iconActionBtn:active { background: var(--dsw-alias-interactive-bg-active); }
 .iconActionRecording { color: var(--dsw-alias-brand-text); }
-.sendButton { width: 38px; height: 38px; margin: 3px; background: var(--dsw-alias-brand-primary); color: white; }
+.sendButton { position: relative; width: 32px; height: 32px; margin: 6px; background: var(--dsw-alias-brand-primary); color: white; }
 .sendButton:active { transform: scale(.94); }
 .attachmentPanel { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; padding: 24px 9px 74px; animation: panelReveal .22s var(--ds-ease-spring); }
 .attachmentPanel button { min-width: 0; height: 100px; border: 0; border-radius: 22px; background: var(--dsw-specific-attachment-tile); color: var(--dsw-alias-label-primary); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; font-size: 21px; }
@@ -35,5 +35,9 @@
 .voiceCancel { color: var(--dsw-alias-state-error-primary); }
 .loadingDot { width: 8px; height: 8px; background: currentColor; border-radius: 50%; animation: dsPulseDot 1s infinite; }
 @keyframes panelReveal { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-@media (max-width: 360px) { .composerCard { padding: 12px 10px 8px; border-radius: 28px; } .textarea { font-size: 20px; } .pillToggle { padding: 0 10px; font-size: 15px; } .rightControls { gap: 0; } .functionRow { gap: 4px; } }
+@media (max-width: 360px) { .composerCard { padding: 12px 10px 8px; border-radius: 28px; } .textarea { font-size: 17px; } .pillToggle { padding: 0 7px; font-size: 12px; } .rightControls { gap: 0; } .functionRow { gap: 4px; } }
 @media (max-height: 600px) { .attachmentPanel { padding-bottom: 10px; padding-top: 12px; } .attachmentPanel button { height: 76px; } .inputBoxWrap { min-height: 36px; } .textarea { font-size: 18px; } }
+.pillToggle::after, .sendButton::after { content: ''; position: absolute; inset: -6px 0; }
+.sendButton::after { inset: -6px; }
+:global(body[data-ui='md3']) .composerCard { border: 0; border-radius: 24px; box-shadow: 0 2px 6px rgb(0 0 0 / 10%); }
+:global(body[data-ui='md3']) .pillToggle { border-radius: 8px; font-weight: 500; }
